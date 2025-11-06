@@ -1,4 +1,5 @@
 <?php
+
 /*********************************************************************
     pages/index.php
 
@@ -13,12 +14,12 @@
     See LICENSE.TXT for details.
 
     vim: expandtab sw=4 ts=4 sts=4:
-**********************************************************************/
-@chdir(dirname(__file__).'/../');
+ **********************************************************************/
+@chdir(dirname(__file__) . '/../');
 
 require_once('client.inc.php');
-require_once(INCLUDE_DIR.'class.format.php');
-require_once(INCLUDE_DIR.'class.page.php');
+require_once(INCLUDE_DIR . 'class.format.php');
+require_once(INCLUDE_DIR . 'class.page.php');
 
 // Determine the requested page
 // - Strip extension
@@ -46,17 +47,17 @@ if (!$selected_page)
 if (!$selected_page->isActive() || $selected_page->getType() != 'other')
     Http::response(404, __('Page Not Found'));
 
-require(CLIENTINC_DIR.'header.inc.php');
+require(CLIENTINC_DIR . 'header.inc.php');
 
 $BUTTONS = false;
-include CLIENTINC_DIR.'templates/sidebar.tmpl.php';
+include CLIENTINC_DIR . 'templates/sidebar.tmpl.php';
 ?>
 <div class="main-content">
-<?php
-print $selected_page->getBodyWithImages();
-?>
+    <?php
+    print $selected_page->getBodyWithImages();
+    ?>
 </div>
 
 <?php
-require(CLIENTINC_DIR.'footer.inc.php');
+require(CLIENTINC_DIR . 'footer.inc.php');
 ?>
