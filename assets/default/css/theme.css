@@ -926,10 +926,11 @@ img.sign-in-image {
     height: auto;
 }
 .login-box {
-    width:40%;
+    /*width:40%;
     display:table-cell;
     box-shadow: 12px 0 15px -15px rgba(0,0,0,0.4);
-    padding:15px;
+    padding:15px;*/
+    visibility: hidden;
 }
 .rtl .login-box {
     box-shadow: -12px 0 15px -15px rgba(0,0,0,0.4);
