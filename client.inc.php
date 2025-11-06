@@ -1,4 +1,5 @@
 <?php
+
 /*********************************************************************
     client.inc.php
 
@@ -12,42 +13,44 @@
     See LICENSE.TXT for details.
 
     vim: expandtab sw=4 ts=4 sts=4:
-**********************************************************************/
-if(!strcasecmp(basename($_SERVER['SCRIPT_NAME']),basename(__FILE__))) die('kwaheri rafiki!');
+ **********************************************************************/
+if (!strcasecmp(basename($_SERVER['SCRIPT_NAME']), basename(__FILE__))) die('kwaheri rafiki!');
 
-$thisdir=str_replace('\\', '/', dirname(__FILE__)).'/';
-if(!file_exists($thisdir.'main.inc.php')) die('Fatal Error.');
+$thisdir = str_replace('\\', '/', dirname(__FILE__)) . '/';
+if (!file_exists($thisdir . 'main.inc.php')) die('Fatal Error.');
 
-require_once($thisdir.'main.inc.php');
+require_once($thisdir . 'main.inc.php');
 
-if(!defined('INCLUDE_DIR')) die('Fatal error');
+if (!defined('INCLUDE_DIR')) die('Fatal error');
 
 // Enforce ACL (if applicable)
 if (!Validator::check_acl('client'))
     die(__('Access Denied'));
 
 /*Some more include defines specific to client only */
-define('CLIENTINC_DIR',INCLUDE_DIR.'client/');
-define('OSTCLIENTINC',TRUE);
+define('CLIENTINC_DIR', INCLUDE_DIR . 'client/');
+define('OSTCLIENTINC', TRUE);
 
-define('ASSETS_PATH',ROOT_PATH.'assets/default/');
+define('ASSETS_PATH', ROOT_PATH . 'assets/default/');
 
 //Check the status of the HelpDesk.
-if (!in_array(strtolower(basename($_SERVER['SCRIPT_NAME'])), array('logo.php','file.php'))
-        && !(is_object($ost) && $ost->isSystemOnline())) {
-    include(ROOT_DIR.'offline.php');
+if (
+    !in_array(strtolower(basename($_SERVER['SCRIPT_NAME'])), array('logo.php', 'file.php'))
+    && !(is_object($ost) && $ost->isSystemOnline())
+) {
+    include(ROOT_DIR . 'offline.php');
     exit;
 }
 
 /* include what is needed on client stuff */
-require_once(INCLUDE_DIR.'class.client.php');
-require_once(INCLUDE_DIR.'class.ticket.php');
-require_once(INCLUDE_DIR.'class.dept.php');
+require_once(INCLUDE_DIR . 'class.client.php');
+require_once(INCLUDE_DIR . 'class.ticket.php');
+require_once(INCLUDE_DIR . 'class.dept.php');
 
 //clear some vars
-$errors=array();
-$msg='';
-$nav=null;
+$errors = array();
+$msg = '';
+$nav = null;
 //Make sure the user is valid..before doing anything else.
 $thisclient = UserAuthenticationBackend::getUser();
 
@@ -60,8 +63,8 @@ if (isset($_GET['lang']) && $_GET['lang']) {
 TextDomain::configureForUser($thisclient);
 
 //is the user logged in?
-if($thisclient && $thisclient->getId() && $thisclient->isValid()){
-     $thisclient->refreshSession();
+if ($thisclient && $thisclient->getId() && $thisclient->isValid()) {
+    $thisclient->refreshSession();
 } else {
     $thisclient = null;
 }
@@ -75,22 +78,23 @@ if ($_POST  && !$ost->checkCSRFToken()) {
 }
 
 //Add token to the header - used on ajax calls [DO NOT CHANGE THE NAME]
-$ost->addExtraHeader('<meta name="csrf_token" content="'.$ost->getCSRFToken().'" />');
+$ost->addExtraHeader('<meta name="csrf_token" content="' . $ost->getCSRFToken() . '" />');
 
 /* Client specific defaults */
 define('PAGE_LIMIT', DEFAULT_PAGE_LIMIT);
 define('SESSION_MAXLIFE', $thisclient ? $thisclient->getMaxIdleTime() :
-        SESSION_TTL);
+    SESSION_TTL);
 
-require(INCLUDE_DIR.'class.nav.php');
+require(INCLUDE_DIR . 'class.nav.php');
 $nav = new UserNav($thisclient, 'home');
 
 $exempt = in_array(basename($_SERVER['SCRIPT_NAME']), array('logout.php', 'ajax.php', 'logs.php', 'upgrade.php'));
 
-if (!$exempt && $thisclient && ($acct = $thisclient->getAccount())
-        && $acct->isPasswdResetForced()) {
+if (
+    !$exempt && $thisclient && ($acct = $thisclient->getAccount())
+    && $acct->isPasswdResetForced()
+) {
     $warn = __('Password change required to continue');
     require('profile.php'); //profile.php must request this file as require_once to avoid problems.
     exit;
 }
-?>

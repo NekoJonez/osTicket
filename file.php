@@ -1,4 +1,5 @@
 <?php
+
 /*********************************************************************
     file.php
 
@@ -13,12 +14,13 @@
     See LICENSE.TXT for details.
 
     vim: expandtab sw=4 ts=4 sts=4:
-**********************************************************************/
+ **********************************************************************/
 require('client.inc.php');
-require_once(INCLUDE_DIR.'class.file.php');
+require_once(INCLUDE_DIR . 'class.file.php');
 
 //Basic checks
-if (!$_GET['key']
+if (
+    !$_GET['key']
     || !$_GET['signature']
     || !$_GET['expires']
     || !($file = AttachmentFile::lookupByHash($_GET['key']))
@@ -29,25 +31,29 @@ if (!$_GET['key']
 // Get the object type the file is attached to
 $type = '';
 $attachment = null;
-if ($_GET['id']
-        && ($attachment=$file->attachments->findFirst(array(
-                    'id' => $_GET['id']))))
+if (
+    $_GET['id']
+    && ($attachment = $file->attachments->findFirst(array(
+        'id' => $_GET['id']
+    )))
+)
     $type = $attachment->type;
 
 // Enforce security settings if enabled.
-if ($cfg->isAuthRequiredForFiles()
-        // FAQ & Page files allowed without login.
-        && !in_array($type, ['P', 'F'])
-        // Check user login
-        && !$thisuser
-        // Check staff login
-        && !StaffAuthenticationBackend::getUser()
-        ) {
+if (
+    $cfg->isAuthRequiredForFiles()
+    // FAQ & Page files allowed without login.
+    && !in_array($type, ['P', 'F'])
+    // Check user login
+    && !$thisuser
+    // Check staff login
+    && !StaffAuthenticationBackend::getUser()
+) {
 
     // Try and determine if an agent is viewing the page / file
     if (strpos($_SERVER['HTTP_REFERRER'], ROOT_PATH .  'scp/') !== false) {
         $_SESSION['_staff']['auth']['dest'] = Http::refresh_url();
-        Http::redirect(ROOT_PATH.'scp/login.php');
+        Http::redirect(ROOT_PATH . 'scp/login.php');
     } else {
         require 'secure.inc.php';
     }
@@ -65,9 +71,8 @@ if ($file->verifySignature($_GET['signature'], $_GET['expires'])) {
         $filename = $attachment ? $attachment->name : $file->getName();
         $disposition = @$_GET['disposition'] ?: false;
         $file->download($filename, $disposition, @$_GET['expires']);
-    }
-    catch (Exception $ex) {
-        Http::response(500, 'Unable to find that file: '.$ex->getMessage());
+    } catch (Exception $ex) {
+        Http::response(500, 'Unable to find that file: ' . $ex->getMessage());
     }
 }
 // else

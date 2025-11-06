@@ -1,4 +1,5 @@
 <?php
+
 /*********************************************************************
     logo.php
 
@@ -14,7 +15,7 @@
     See LICENSE.TXT for details.
 
     vim: expandtab sw=4 ts=4 sts=4:
-**********************************************************************/
+ **********************************************************************/
 // Use Noop Session Handler
 define('NOOP_SESSION', true);
 require('client.inc.php');
@@ -25,5 +26,4 @@ if (($logo = $ost->getConfig()->getClientLogo())) {
 
 header("Cache-Control: private, max-age=$ttl");
 header('Pragma: private');
-header('Location: '.ASSETS_PATH.'images/logo.png');
-?>
+header('Location: ' . ASSETS_PATH . 'images/logo.png');

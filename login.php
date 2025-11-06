@@ -1,4 +1,5 @@
 <?php
+
 /*********************************************************************
     login.php
 
@@ -15,17 +16,19 @@
     See LICENSE.TXT for details.
 
     vim: expandtab sw=4 ts=4 sts=4:
-**********************************************************************/
+ **********************************************************************/
 require_once('client.inc.php');
-if(!defined('INCLUDE_DIR')) die('Fatal Error');
-define('CLIENTINC_DIR',INCLUDE_DIR.'client/');
-define('OSTCLIENTINC',TRUE); //make includes happy
+if (!defined('INCLUDE_DIR')) die('Fatal Error');
+define('CLIENTINC_DIR', INCLUDE_DIR . 'client/');
+define('OSTCLIENTINC', TRUE); //make includes happy
 
-require_once(INCLUDE_DIR.'class.client.php');
-require_once(INCLUDE_DIR.'class.ticket.php');
+require_once(INCLUDE_DIR . 'class.client.php');
+require_once(INCLUDE_DIR . 'class.ticket.php');
 
-if ($cfg->getClientRegistrationMode() == 'disabled'
-        || isset($_POST['lticket']))
+if (
+    $cfg->getClientRegistrationMode() == 'disabled'
+    || isset($_POST['lticket'])
+)
     $inc = 'accesslink.inc.php';
 else
     $inc = 'login.inc.php';
@@ -48,8 +51,11 @@ if ($_POST) {
 if ($_POST && isset($_POST['luser'])) {
     if (!$_POST['luser'])
         $errors['err'] = __('Valid username or email address is required');
-    elseif (($user = UserAuthenticationBackend::process(trim($_POST['luser']),
-            substr($_POST['lpasswd'], 0, 128), $errors))) {
+    elseif (($user = UserAuthenticationBackend::process(
+        trim($_POST['luser']),
+        substr($_POST['lpasswd'], 0, 128),
+        $errors
+    ))) {
         if ($user instanceof ClientCreateRequest) {
             if ($cfg && $cfg->isClientRegistrationEnabled()) {
                 // Attempt to automatically register
@@ -59,26 +65,26 @@ if ($_POST && isset($_POST['luser'])) {
                 // Auto-registration failed. Show the user the info we have
                 $inc = 'register.inc.php';
                 $user_form = UserForm::getUserForm()->getForm($user->getInfo());
-            }
-            else {
+            } else {
                 $errors['err'] = __('Access Denied. Contact your help desk administrator to have an account registered for you');
                 // fall through to show login page again
             }
-        }
-        else {
+        } else {
             Http::redirect($_SESSION['_client']['auth']['dest']
                 ?: 'tickets.php');
         }
-    } elseif(!$errors['err']) {
+    } elseif (!$errors['err']) {
         $errors['err'] = sprintf('%s - %s', __('Invalid username or password'), __('Please try again!'));
     }
     $suggest_pwreset = true;
-}
-elseif ($_POST && isset($_POST['lticket'])) {
+} elseif ($_POST && isset($_POST['lticket'])) {
     if (!Validator::is_email($_POST['lemail']))
         $errors['err'] = __('Valid email address and ticket number required');
-    elseif (($user = UserAuthenticationBackend::process($_POST['lemail'],
-            $_POST['lticket'], $errors))) {
+    elseif (($user = UserAuthenticationBackend::process(
+        $_POST['lemail'],
+        $_POST['lticket'],
+        $errors
+    ))) {
 
         // If email address verification is not required, then provide
         // immediate access to the ticket!
@@ -92,34 +98,36 @@ elseif ($_POST && isset($_POST['lticket'])) {
         // force attempts (which doesn't buy much since the link is emailed)
         if ($ticket) {
             $ticket->sendAccessLink($user);
-            $msg = sprintf(__("%s - access link sent to your email!"),
-                Format::htmlchars($user->getName()->getFirst()));
+            $msg = sprintf(
+                __("%s - access link sent to your email!"),
+                Format::htmlchars($user->getName()->getFirst())
+            );
             $_POST = null;
         } else {
-            $errors['err'] = sprintf('%s - %s',
+            $errors['err'] = sprintf(
+                '%s - %s',
                 __('Invalid email or ticket number'),
-                __('Please try again!'));
+                __('Please try again!')
+            );
         }
-    } elseif(!$errors['err']) {
+    } elseif (!$errors['err']) {
         $errors['err'] = sprintf('%s - %s', __('Invalid email or ticket number'), __('Please try again!'));
     }
-}
-elseif (isset($_GET['do'])) {
-    switch($_GET['do']) {
-    case 'ext':
-        // Lookup external backend
-        if ($bk = UserAuthenticationBackend::getBackend($_GET['bk'])) {
-            $result = $bk->triggerAuth();
-            if ($result instanceof AccessDenied) {
-                $errors['err'] = $result->getMessage();
+} elseif (isset($_GET['do'])) {
+    switch ($_GET['do']) {
+        case 'ext':
+            // Lookup external backend
+            if ($bk = UserAuthenticationBackend::getBackend($_GET['bk'])) {
+                $result = $bk->triggerAuth();
+                if ($result instanceof AccessDenied) {
+                    $errors['err'] = $result->getMessage();
+                }
             }
-        }
     }
-}
-elseif ($user = UserAuthenticationBackend::processSignOn($errors, false)) {
+} elseif ($user = UserAuthenticationBackend::processSignOn($errors, false)) {
     // Users from the ticket access link
     if ($user && $user instanceof TicketUser && $user->getTicketId())
-        Http::redirect('tickets.php?id='.$user->getTicketId());
+        Http::redirect('tickets.php?id=' . $user->getTicketId());
     // Users imported from an external auth backend
     elseif ($user instanceof ClientCreateRequest) {
         if ($cfg && $cfg->isClientRegistrationEnabled()) {
@@ -130,15 +138,13 @@ elseif ($user = UserAuthenticationBackend::processSignOn($errors, false)) {
             // Unable to auto-register. Fill in what we have and let the
             // user complete the info
             $inc = 'register.inc.php';
-        }
-        else {
+        } else {
             $errors['err'] = __('Access Denied. Contact your help desk administrator to have an account registered for you');
             // fall through to show login page again
         }
-    }
-    elseif ($user instanceof AuthenticatedUser) {
+    } elseif ($user instanceof AuthenticatedUser) {
         Http::redirect($_SESSION['_client']['auth']['dest']
-                ?: 'tickets.php');
+            ?: 'tickets.php');
     }
 }
 
@@ -147,7 +153,6 @@ if (!$nav) {
     $nav->setActiveNav('status');
 }
 
-require CLIENTINC_DIR.'header.inc.php';
-require CLIENTINC_DIR.$inc;
-require CLIENTINC_DIR.'footer.inc.php';
-?>
+require CLIENTINC_DIR . 'header.inc.php';
+require CLIENTINC_DIR . $inc;
+require CLIENTINC_DIR . 'footer.inc.php';

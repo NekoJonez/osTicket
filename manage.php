@@ -17,7 +17,7 @@
     See LICENSE.TXT for details.
 
     vim: expandtab sw=4 ts=4 sts=4:
-**********************************************************************/
+ **********************************************************************/
 require_once 'bootstrap.php';
 
 // Make sure the script is executed via CLI
@@ -25,9 +25,10 @@ if (!osTicket::is_cli())
     die("Management only supported from command-line\n");
 
 require_once CLI_DIR . 'cli.inc.php';
-class Manager extends Module {
+class Manager extends Module
+{
     var $prologue =
-        "Manage one or more osTicket installations";
+    "Manage one or more osTicket installations";
 
     var $arguments = array(
         'action' => "Action to be managed"
@@ -37,8 +38,9 @@ class Manager extends Module {
 
     var $autohelp = false;
 
-    function showHelp() {
-        foreach (glob(CLI_DIR.'modules/*.php') as $script)
+    function showHelp()
+    {
+        foreach (glob(CLI_DIR . 'modules/*.php') as $script)
             include_once $script;
 
         global $registered_modules;
@@ -51,11 +53,12 @@ class Manager extends Module {
         echo "\n";
         ksort($registered_modules);
         $width = max(array_map('strlen', array_keys($registered_modules)));
-        foreach ($registered_modules as $name=>$mod)
+        foreach ($registered_modules as $name => $mod)
             echo str_pad($name, $width + 2) . $mod->prologue . "\n";
     }
 
-    function run($args, $options) {
+    function run($args, $options)
+    {
         if ($options['help'] && !$args['action'])
             $this->showHelp();
 
@@ -63,7 +66,7 @@ class Manager extends Module {
             $action = $args['action'];
 
             global $argv;
-            foreach ($argv as $idx=>$val)
+            foreach ($argv as $idx => $val)
                 if ($val == $action)
                     unset($argv[$idx]);
 
